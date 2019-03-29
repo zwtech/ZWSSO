@@ -1,0 +1,31 @@
+{{template "header" }}
+
+<style>
+    .registerInputGroup{
+        margin-top: 20px;
+    }
+</style>
+
+<body>
+<div class="coreContainer">
+    <h1 id="registerLabel"></h1>
+    <div class="registerInputGroup">
+        <div class="form-group">
+            <label id="emailLabel"></label>
+            <input type="email" class="form-control" id="userLoginEmail" placeholder="tom@hanks.com">
+            <small class="form-text text-muted" id="noSharingLabel"></small>
+        </div>
+        <div class="form-group">
+            <label id="passwordLabel"></label>
+            <input type="password" class="form-control" id="userLoginPassword" placeholder="******">
+        </div>
+        <div class="form-group">
+            <label id="confirmPasswordLabel"></label>
+            <input type="password" class="form-control" id="userConfirmLoginPassword" placeholder="******">
+        </div>
+        <button type="submit" class="btn btn-secondary" id="backToLoginButton"></button>
+        <button type="submit" class="btn btn-primary" id="submitButton"></button>
+    </div>
+</div>
+</body>
+
