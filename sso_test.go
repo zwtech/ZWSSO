@@ -13,6 +13,6 @@ func TestInsert(test *testing.T) {
 }
 
 func TestLogin(test *testing.T) {
-	fmt.Println(GetToken("testEmail@ieee.org",
+	fmt.Println(GetUserObj("testEmail@ieee.org",
 		"testPassword"))
 }
