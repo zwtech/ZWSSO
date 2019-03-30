@@ -135,27 +135,31 @@ func regenerateSiteTokenAPI(c *gin.Context) {
 	})
 }
 
-func getAllSiteAPI(c *gin.Context) {
+func getAllSitesAPI(c *gin.Context) {
 	var token string
 	token = c.Query("token")
 	if token == "" {
 		c.JSON(200, gin.H{
-			"success":          0,
-			"sitePublicToken":  "",
-			"sitePrivateToken": "",
-			"info":             "No token provided",
+			"success": 0,
+			"sites":   nil,
+			"info":    "No token provided",
 		})
 		return
 	}
 	if !isTokenAdmin(token) {
 		c.JSON(200, gin.H{
-			"success":          0,
-			"sitePublicToken":  "",
-			"sitePrivateToken": "",
-			"info":             "User is not admin",
+			"success": 0,
+			"sites":   nil,
+			"info":    "User is not admin",
 		})
 		return
 	}
-	var sites []Site
-	//todo: finish it
+	var sites *[]SiteWithoutPrivateToken
+	sites = getAllSites()
+
+	c.JSON(200, gin.H{
+		"success": 1,
+		"sites":   sites,
+		"info":    "",
+	})
 }

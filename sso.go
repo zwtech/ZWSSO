@@ -10,6 +10,11 @@ type Site struct {
 	SitePrivateToken string
 }
 
+type SiteWithoutPrivateToken struct {
+	Domain          string
+	SitePublicToken string
+}
+
 type User struct {
 	Token      string
 	Site       []string
@@ -157,9 +162,13 @@ func (s *Site) RegenerateSiteToken() {
 	s.update()
 }
 
-func getAllSites() *[]Site {
-	var sites = &Site{}
-	// todo: finish it
+func getAllSites() *[]SiteWithoutPrivateToken {
+	var sites []SiteWithoutPrivateToken
+	conn := mongoSession.Copy()
+	defer conn.Close()
+	_ = conn.DB("").C("site").Find(
+		bson.M{}).All(&sites)
+	return &sites
 }
 
 func getSiteByDomain(domain string) *Site {
