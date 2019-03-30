@@ -1,10 +1,179 @@
 {{template "header" }}
 
+<style type="text/css">
+    #navBar{
+        z-index: 100;
+        margin: 5%;
+        background-color: transparent;
+    }
+
+    .navButtonLocal{
+        position:relative;
+    }
+    .navButtonLocal::after{
+        content:'';
+        display:block;
+        width:0;
+        height:1px;
+        position:absolute;
+        left:0px;
+        bottom:-1px;
+        background:#222;
+        transition:all 0.3s ease-in-out;
+    }
+    .navButtonLocal:hover::after{
+        width:100%;
+    }
+    #addSiteButton{
+        margin-top: 10px;
+    }
+    #sourceAdminLabel{
+        margin-top: 20px;
+    }
+</style>
+<link rel="stylesheet" href="/assets/bootstrap-table.min.css">
 
 
-<body>
-<div class="coreContainer">
+<div>
+    <!-- starting nav -->
+    <nav class="navbar navbar-expand-sm navbar-light " class="nav-local" id="navBar">
+        <ul class="navbar-nav mr-auto mt-lg-0" id='navbarBadges'>
+            <li class="nav-item">
+                <a class="nav-link navButtonLocal" id="homeButton" onclick="goHome()"></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link navButtonLocal" id="settingButton" onclick="goSetting()"></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link navButtonLocal" id="helpButton"></a>
+            </li>
+        </ul>
+    </nav>
 
+    <div class="coreContainer">
+        <div id="homeContainer" style="display: none">
+            <h1 id="homeLabel"></h1>
+            <h6 id="userStatsLabel"></h6>
+            <canvas id="userChart" width="100%"></canvas>
+            <br>
+            <h6 id="ipStatsLabel"></h6>
+            <div class="ipStatsContainer">
+                <canvas id="ipChart" width="30%"></canvas>
+                <canvas id="locationChart" width="30%"></canvas>
+            </div>
+        </div>
+        <div id="settingContainer" style="display: none">
+            <h1 id="settingLabel"></h1>
+            <br>
+            <h6 id="siteAdminLabel"></h6>
+            <table id="siteTable"
+                   data-sortable="true"
+                   data-pagination="true"
+                   data-toggle="table"
+                   data-url="/"
+            >
+                <thead>
+                <tr>
+                    <!-- TODO: Add th -->
+                    <th data-field=""></th>
+                </tr>
+                </thead>
+            </table>
+            <button class="btn btn-primary" id="addSiteButton"></button>
+            <br>
+            <h6 id="sourceAdminLabel"></h6>
+            <table id="sourceTable"
+                   data-sortable="true"
+                   data-pagination="true"
+                   data-toggle="table"
+                   data-url="/"
+            >
+                <thead>
+                <tr>
+                    <!-- TODO: Add th -->
+                    <th data-field=""></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
 </div>
-</body>
+<script src="/assets/charts.js"></script>
+<script src="/assets/bootstrap-table.min.js"></script>
+
+<script>
+    //navbar
+    function goSetting(){
+        $("#homeContainer").hide();
+        $("#settingContainer").fadeIn("fast");
+    }
+    function goHome(){
+        $("#settingContainer").hide();
+        $("#homeContainer").fadeIn("fast");
+    }
+    goHome();
+
+    // charts
+    var userChart = document.getElementById('userChart').getContext('2d');
+    new Chart(userChart, {
+        type: 'line',
+        data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+                label: 'Logins',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                ],
+                borderWidth: 1
+            }, {
+                label: 'Registrations',
+                data: [8, 2, 1, 12, 4, 7],
+                backgroundColor: [
+                    'rgb(75, 192, 192)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {}
+    });
+    var ipChart = document.getElementById('ipChart').getContext('2d');
+    new Chart(ipChart, {
+        type: 'pie',
+        data: {
+            labels: ['Red', 'Blue', 'Yellow'],
+            datasets: [{
+                label: 'Logins',
+                data: [12, 19, 3],
+                backgroundColor: [
+                    "rgb(255, 99, 132)",
+                    "rgb(54, 162, 235)",
+                    "rgb(255, 205, 86)"],
+                borderWidth: 1
+            }]
+        },
+        options: {}
+    });
+    var locationChart = document.getElementById('locationChart').getContext('2d');
+    new Chart(locationChart, {
+        type: 'pie',
+        data: {
+            labels: ['Red', 'Blue', 'Yellow'],
+            datasets: [{
+                label: 'Logins',
+                data: [12, 19, 3],
+                backgroundColor: [
+                    "rgb(255, 99, 132)",
+                    "rgb(54, 162, 235)",
+                    "rgb(255, 205, 86)"],
+                borderWidth: 1
+            }]
+        },
+        options: {}
+    });
+
+    $("#jobTable").bootstrapTable({});
+    $("#sourceTable").bootstrapTable({});
+
+</script>
 
