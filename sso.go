@@ -44,18 +44,18 @@ func (s *Site) update() {
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	_ = conn.DB("").C("site").Update(
-		bson.M{"email": s.SitePublicToken}, s)
+		bson.M{"domain": s.Domain}, s)
 }
 
 func (u *User) reassignToken() {
-	var currentTime = string(getCurrentTime())
+	var currentTime = getCurrentTime()
 	u.Token = encryptString(u.Token + currentTime)
 	u.update()
 }
 
 func Register(email string, password string, data interface{}) *User {
 	var encryptedPassword = encryptString(password)
-	var currentTime = string(getCurrentTime())
+	var currentTime = getCurrentTime()
 	var resultUser = &User{
 		Password: encryptedPassword,
 		Email:    email,
@@ -79,6 +79,13 @@ func GetUserObj(email string, password string) *User {
 	return resultUser
 }
 
+func (u *User) isUserAdmin() bool {
+	if u.Email == "admin" {
+		return true
+	}
+	return false
+}
+
 func GetUserWithToken(token string) *User {
 	var resultUser = &User{}
 	conn := mongoSession.Copy()
@@ -88,13 +95,22 @@ func GetUserWithToken(token string) *User {
 	return resultUser
 }
 
+func isTokenAdmin(token string) bool {
+	var user *User
+	user = GetUserWithToken(token)
+	if user.Email == "admin" {
+		return true
+	}
+	return false
+}
+
 // TODO: Testing
 func GetUserWithSiteToken(siteToken string) *User {
 	var resultUser = &User{}
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	_ = conn.DB("").C("user").Find(
-		bson.M{"$in": bson.M{"siteToken": siteToken}}).One(&resultUser)
+		bson.M{"$in": bson.M{"sitetoken": siteToken}}).One(&resultUser)
 	return resultUser
 }
 
@@ -112,10 +128,19 @@ func (u *User) UserAddSiteToken(token string) {
 	u.update()
 }
 
+func isSiteAdded(domain string) bool {
+	conn := mongoSession.Copy()
+	defer conn.Close()
+	var site = &Site{}
+	_ = conn.DB("").C("site").Find(
+		bson.M{"domain": domain}).One(&site)
+	return site.Domain != ""
+}
+
 func AddSite(domain string, key string) *Site {
 	conn := mongoSession.Copy()
 	defer conn.Close()
-	var currentTime = string(getCurrentTime())
+	var currentTime = getCurrentTime()
 	var resultSite = &Site{
 		Domain:           domain,
 		SitePublicToken:  encryptString(domain + currentTime),
@@ -125,12 +150,33 @@ func AddSite(domain string, key string) *Site {
 	return resultSite
 }
 
+func (s *Site) RegenerateSiteToken() {
+	var currentTime = getCurrentTime()
+	s.SitePublicToken = encryptString(s.SitePublicToken + currentTime)
+	s.SitePrivateToken = encryptString(s.SitePrivateToken + currentTime)
+	s.update()
+}
+
+func getAllSites() *[]Site {
+	var sites = &Site{}
+	// todo: finish it
+}
+
+func getSiteByDomain(domain string) *Site {
+	var resultSite = &Site{}
+	conn := mongoSession.Copy()
+	defer conn.Close()
+	_ = conn.DB("").C("site").Find(
+		bson.M{"domain": domain}).One(&resultSite)
+	return resultSite
+}
+
 func getSiteByPublicToken(token string) *Site {
 	var resultSite = &Site{}
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	_ = conn.DB("").C("site").Find(
-		bson.M{"sitePublicToken": token}).One(&resultSite)
+		bson.M{"sitepublictoken": token}).One(&resultSite)
 	return resultSite
 }
 
@@ -139,7 +185,7 @@ func getSiteByPrivateToken(token string) *Site {
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	_ = conn.DB("").C("site").Find(
-		bson.M{"sitePrivateToken": token}).One(&resultSite)
+		bson.M{"siteprivatetoken": token}).One(&resultSite)
 	return resultSite
 }
 

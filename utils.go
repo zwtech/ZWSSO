@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -12,8 +13,8 @@ func encryptString(str string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func getCurrentTime() int64 {
+func getCurrentTime() string {
 	current := time.Now()
-	timestamp := current.UnixNano()
-	return timestamp
+	timestamp := current.Unix()
+	return strconv.FormatInt(timestamp, 10)
 }

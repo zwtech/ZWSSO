@@ -7,8 +7,8 @@ import (
 
 func TestInsert(test *testing.T) {
 	_ = Register(
-		"testEmail@ieee.org",
-		"testPassword",
+		"admin",
+		"admin",
 		"testData")
 }
 

@@ -6,10 +6,7 @@ import (
 )
 
 func login(c *gin.Context) {
-	c.HTML(200, "login.html", gin.H{
-		"APIHost":   "http://127.0.0.1:8080/",
-		"CrawlHost": "http://127.0.0.1:8848/",
-	})
+	c.HTML(200, "login.html", gin.H{})
 }
 
 func register(c *gin.Context) {
@@ -28,6 +25,10 @@ func startServer() {
 	router.LoadHTMLGlob("templates/*")
 
 	//api
+	router.GET("/api/addSite", addSiteAPI)
+	router.GET("/api/loginAdmin", loginAdminAPI)
+	router.GET("/api/regenerateSiteToken", regenerateSiteTokenAPI)
+	router.GET("/api/getAllSite", getAllSiteAPI)
 
 	//web pages
 	router.GET("/", login)
