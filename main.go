@@ -29,6 +29,8 @@ func startServer() {
 	router.GET("/api/loginAdmin", loginAdminAPI)
 	router.GET("/api/regenerateSiteToken", regenerateSiteTokenAPI)
 	router.GET("/api/getAllSites", getAllSitesAPI)
+	router.GET("/api/userLoginByEmail", userLoginByEmailAPI)
+	router.GET("/api/userRegisterByEmail", userRegisterByEmailAPI)
 
 	//web pages
 	router.GET("/", login)

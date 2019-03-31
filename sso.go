@@ -17,11 +17,17 @@ type SiteWithoutPrivateToken struct {
 
 type User struct {
 	Token      string
-	Site       []string
 	Password   string
-	Email      string
+	Identifier string
 	Data       interface{}
 	SiteTokens []string
+}
+
+type UserLog struct {
+	Identifier string
+	UserIP     string
+	Action     int
+	ActionTime string
 }
 
 // User declaration
@@ -38,11 +44,17 @@ func (s *Site) save() {
 	_ = conn.DB("").C("site").Insert(s)
 }
 
+func (ul *UserLog) save() {
+	conn := mongoSession.Copy()
+	defer conn.Close()
+	_ = conn.DB("").C("log").Insert(ul)
+}
+
 func (u *User) update() {
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	_ = conn.DB("").C("user").Update(
-		bson.M{"email": u.Email}, u)
+		bson.M{"email": u.Identifier}, u)
 }
 
 func (s *Site) update() {
@@ -58,34 +70,48 @@ func (u *User) reassignToken() {
 	u.update()
 }
 
-func Register(email string, password string, data interface{}) *User {
+func RegisterByEmail(email string, password string, ip string) *User {
 	var encryptedPassword = encryptString(password)
 	var currentTime = getCurrentTime()
 	var resultUser = &User{
-		Password: encryptedPassword,
-		Email:    email,
-		Data:     data,
-		Token:    encryptString(encryptedPassword + currentTime),
+		Password:   encryptedPassword,
+		Identifier: email,
+		Token:      encryptString(encryptedPassword + currentTime),
+	}
+	var log = &UserLog{
+		Identifier: email,
+		UserIP:     ip,
+		Action:     0,
+		ActionTime: currentTime,
 	}
 	resultUser.save()
+	log.save()
 	return resultUser
 }
 
 // aka Login
-func GetUserObj(email string, password string) *User {
+func GetUserObj(identifier string, password string, ip string) *User {
 	var resultUser = &User{}
 	var encryptedPassword = encryptString(password)
+	var currentTime = getCurrentTime()
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	_ = conn.DB("").C("user").Find(
-		bson.M{"email": email,
+		bson.M{"email": identifier,
 			"password": encryptedPassword}).One(&resultUser)
-	resultUser.reassignToken()
+	var log = &UserLog{
+		Identifier: identifier,
+		UserIP:     ip,
+		Action:     1,
+		ActionTime: currentTime,
+	}
+	resultUser.save()
+	log.save()
 	return resultUser
 }
 
 func (u *User) isUserAdmin() bool {
-	if u.Email == "admin" {
+	if u.Identifier == "admin" {
 		return true
 	}
 	return false
@@ -103,7 +129,7 @@ func GetUserWithToken(token string) *User {
 func isTokenAdmin(token string) bool {
 	var user *User
 	user = GetUserWithToken(token)
-	if user.Email == "admin" {
+	if user.Identifier == "admin" {
 		return true
 	}
 	return false
@@ -120,12 +146,8 @@ func GetUserWithSiteToken(siteToken string) *User {
 }
 
 func (u *User) Logout() {
+	u.SiteTokens = nil
 	u.reassignToken()
-}
-
-func (u *User) UserAddSite(newSite string) {
-	u.Site = append(u.Site, newSite)
-	u.update()
 }
 
 func (u *User) UserAddSiteToken(token string) {
@@ -198,15 +220,30 @@ func getSiteByPrivateToken(token string) *Site {
 	return resultSite
 }
 
-func LoginUserForSite(token string, email string, password string) string {
+func LoginUserForSiteByEmail(token string, email string, password string, ip string) string {
 	var site *Site
 	var user *User
 	var newSiteToken string
 	site = getSiteByPublicToken(token)
 	if "" != site.Domain {
-		user = GetUserObj(email, password)
+		user = GetUserObj(email, password, ip)
 		if "" != user.Token {
-			user.UserAddSite(site.SitePrivateToken)
+			newSiteToken = encryptString(user.Token + site.SitePrivateToken)
+			user.UserAddSiteToken(newSiteToken)
+			return newSiteToken
+		}
+	}
+	return ""
+}
+
+func RegisterUserForSiteByEmail(token string, email string, password string, ip string) string {
+	var site *Site
+	var user *User
+	var newSiteToken string
+	site = getSiteByPublicToken(token)
+	if "" != site.Domain {
+		user = RegisterByEmail(email, password, ip)
+		if "" != user.Token {
 			newSiteToken = encryptString(user.Token + site.SitePrivateToken)
 			user.UserAddSiteToken(newSiteToken)
 			return newSiteToken

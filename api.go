@@ -5,8 +5,8 @@ import (
 )
 
 func loginAdminAPI(c *gin.Context) {
-	email := c.Query("email")
-	if email != "admin" {
+	un := c.Query("email")
+	if un != "admin" {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
@@ -15,8 +15,9 @@ func loginAdminAPI(c *gin.Context) {
 		return
 	}
 	password := c.Query("password")
+	ip := c.ClientIP()
 	var user *User
-	user = GetUserObj(email, password)
+	user = GetUserObj(un, password, ip)
 	if user.isUserAdmin() {
 		c.JSON(200, gin.H{
 			"success": 1,
@@ -160,6 +161,100 @@ func getAllSitesAPI(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"success": 1,
 		"sites":   sites,
+		"info":    "",
+	})
+}
+
+func userLoginByEmailAPI(c *gin.Context) {
+	var publicToken string
+	publicToken = c.Query("publicToken")
+	if publicToken == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "Not a public token",
+		})
+		return
+	}
+	email := c.Query("email")
+	if email == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "No email",
+		})
+		return
+	}
+	password := c.Query("password")
+	if password == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "No password",
+		})
+		return
+	}
+	ip := c.ClientIP()
+	var userSiteToken string
+	userSiteToken = LoginUserForSiteByEmail(publicToken, email, password, ip)
+	if userSiteToken == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "Not a valid email or password",
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"success": 1,
+		"token":   userSiteToken,
+		"info":    "",
+	})
+}
+
+func userRegisterByEmailAPI(c *gin.Context) {
+	var publicToken string
+	publicToken = c.Query("publicToken")
+	if publicToken == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "Not a public token",
+		})
+		return
+	}
+	email := c.Query("email")
+	if email == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "No email",
+		})
+		return
+	}
+	password := c.Query("password")
+	if password == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "No password",
+		})
+		return
+	}
+	ip := c.ClientIP()
+	var userSiteToken string
+	userSiteToken = RegisterUserForSiteByEmail(publicToken, email, password, ip)
+	if userSiteToken == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"token":   "",
+			"info":    "Not a valid email or password",
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"success": 1,
+		"token":   userSiteToken,
 		"info":    "",
 	})
 }
