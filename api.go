@@ -172,6 +172,7 @@ func userLoginByEmailAPI(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "Not a public token",
 		})
 		return
@@ -181,6 +182,7 @@ func userLoginByEmailAPI(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "No email",
 		})
 		return
@@ -190,17 +192,20 @@ func userLoginByEmailAPI(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "No password",
 		})
 		return
 	}
 	ip := c.ClientIP()
 	var userSiteToken string
-	userSiteToken = LoginUserForSiteByEmail(publicToken, email, password, ip)
+	var domain string
+	userSiteToken, domain = LoginUserForSiteByEmail(publicToken, email, password, ip)
 	if userSiteToken == "" {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "Not a valid email or password",
 		})
 		return
@@ -208,6 +213,7 @@ func userLoginByEmailAPI(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"success": 1,
 		"token":   userSiteToken,
+		"domain":  domain,
 		"info":    "",
 	})
 }
@@ -219,6 +225,7 @@ func userRegisterByEmailAPI(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "Not a public token",
 		})
 		return
@@ -228,6 +235,7 @@ func userRegisterByEmailAPI(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "No email",
 		})
 		return
@@ -237,17 +245,20 @@ func userRegisterByEmailAPI(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "No password",
 		})
 		return
 	}
 	ip := c.ClientIP()
 	var userSiteToken string
-	userSiteToken = RegisterUserForSiteByEmail(publicToken, email, password, ip)
+	var domain string
+	userSiteToken, domain = RegisterUserForSiteByEmail(publicToken, email, password, ip)
 	if userSiteToken == "" {
 		c.JSON(200, gin.H{
 			"success": 0,
 			"token":   "",
+			"domain":  "",
 			"info":    "Not a valid email or password",
 		})
 		return
@@ -255,6 +266,7 @@ func userRegisterByEmailAPI(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"success": 1,
 		"token":   userSiteToken,
+		"domain":  domain,
 		"info":    "",
 	})
 }
