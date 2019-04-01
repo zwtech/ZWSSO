@@ -97,7 +97,7 @@ func GetUserObj(identifier string, password string, ip string) *User {
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	_ = conn.DB("").C("user").Find(
-		bson.M{"email": identifier,
+		bson.M{"identifier": identifier,
 			"password": encryptedPassword}).One(&resultUser)
 	var log = &UserLog{
 		Identifier: identifier,
@@ -105,7 +105,6 @@ func GetUserObj(identifier string, password string, ip string) *User {
 		Action:     1,
 		ActionTime: currentTime,
 	}
-	resultUser.save()
 	log.save()
 	return resultUser
 }
@@ -235,6 +234,14 @@ func LoginUserForSiteByEmail(token string, email string,
 		}
 	}
 	return "", "", ""
+}
+
+func isUserIdentifierUsed(identifier string) int {
+	conn := mongoSession.Copy()
+	defer conn.Close()
+	count, _ := conn.DB("").C("user").Find(
+		bson.M{"identifier": identifier}).Count()
+	return count
 }
 
 func RegisterUserForSiteByEmail(token string, email string,

@@ -89,7 +89,7 @@
         $.post(url, {
             publicToken: $_GET['publicToken'],
             email: userRegEmail.val(),
-            passsword: userRegPassword.val(),
+            password: userRegPassword.val(),
         }).then(function (result) {
             if (!result["success"]){
                 swal("Oops", result["info"], "warning");

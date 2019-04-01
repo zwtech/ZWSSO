@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 func loginAdminAPI(c *gin.Context) {
 	un := c.PostForm("email")
-	fmt.Println(un)
 	if un != ADMIN_EMAIL {
 		c.JSON(200, gin.H{
 			"success": 0,
