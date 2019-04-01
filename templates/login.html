@@ -27,8 +27,6 @@
 </body>
 
 <script>
-
-
     var userLoginEmail = $("#userLoginEmail");
     var userLoginNotice = $("#notRegisterLabel");
     var userLoginPassword = $("#userLoginPassword");
@@ -41,9 +39,22 @@
             userLoginNotice.css("color", "#ff4d4d")
         }
     });
+    userLoginEmail.blur(function () {
+        var identifierCheckURL = "/api/isIdentifierUsed?identifier=";
+        $.get(identifierCheckURL + userLoginEmail.val()).then(
+            function (result) {
+                if (!result["isUsed"]){
+                    userLoginNotice.html($.i18n.prop("UserNotRegistered"));
+                    userLoginNotice.css("color", "#ff4d4d")
+                }
+            }
+        );
+    });
 
     $("#registerButton").click(function() {
-        window.location.href = "/register";
+        var userEmail = userLoginEmail.val();
+        window.location.href = "/register?email=" + userEmail
+            + "&publicToken=" + $_GET["publicToken"];
     });
 
     $("#submitButton").click(function() {
@@ -51,12 +62,12 @@
             swal("Oops", $.i18n.prop("EmailHasProblem"), "error");
             return
         }
-        var url = "/api/userLoginByEmail";
+        var loginURL = "/api/userLoginByEmail";
         if(!$_GET['publicToken']){
             loginAdmin();
             return
         }
-        $.post(url, {
+        $.post(loginURL, {
             publicToken: $_GET['publicToken'],
             email: userLoginEmail.val(),
             password: userLoginPassword.val(),
@@ -84,4 +95,5 @@
             }
         })
     }
+
 </script>

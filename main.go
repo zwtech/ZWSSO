@@ -31,6 +31,7 @@ func startServer() {
 	router.GET("/api/getAllSites", getAllSitesAPI)
 	router.POST("/api/userLoginByEmail", userLoginByEmailAPI)
 	router.POST("/api/userRegisterByEmail", userRegisterByEmailAPI)
+	router.GET("/api/isIdentifierUsed", isIdentifierUsedAPI)
 
 	//web pages
 	router.GET("/", login)

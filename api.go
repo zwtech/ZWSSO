@@ -282,3 +282,23 @@ func userRegisterByEmailAPI(c *gin.Context) {
 		"info":      "",
 	})
 }
+
+func isIdentifierUsedAPI(c *gin.Context) {
+	var identifier string
+	identifier = c.Query("identifier")
+	if identifier == "" {
+		c.JSON(200, gin.H{
+			"success": 0,
+			"isUsed":  0,
+			"info":    "No identifier",
+		})
+		return
+	}
+	var result int
+	result = isIdentifierUsed(identifier)
+	c.JSON(200, gin.H{
+		"success": 1,
+		"isUsed":  result,
+		"info":    "",
+	})
+}

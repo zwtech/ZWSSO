@@ -36,6 +36,10 @@
     var userRegEmail = $("#userRegEmail");
     var userRegNotice = $("#noSharingLabel");
 
+    if ($_GET["email"]){
+        userRegEmail.val($_GET["email"]);
+    }
+
     userRegEmail.on('input', function () {
         if (checkEmail(userRegEmail.val())){
             userRegNotice.html($.i18n.prop("EmailHasNoProblem"));

@@ -236,7 +236,7 @@ func LoginUserForSiteByEmail(token string, email string,
 	return "", "", ""
 }
 
-func isUserIdentifierUsed(identifier string) int {
+func isIdentifierUsed(identifier string) int {
 	conn := mongoSession.Copy()
 	defer conn.Close()
 	count, _ := conn.DB("").C("user").Find(
