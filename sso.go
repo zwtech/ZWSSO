@@ -220,7 +220,8 @@ func getSiteByPrivateToken(token string) *Site {
 	return resultSite
 }
 
-func LoginUserForSiteByEmail(token string, email string, password string, ip string) (string, string) {
+func LoginUserForSiteByEmail(token string, email string,
+	password string, ip string) (string, string, string) {
 	var site *Site
 	var user *User
 	var newSiteToken string
@@ -230,13 +231,14 @@ func LoginUserForSiteByEmail(token string, email string, password string, ip str
 		if "" != user.Token {
 			newSiteToken = encryptString(user.Token + site.SitePrivateToken)
 			user.UserAddSiteToken(newSiteToken)
-			return newSiteToken, site.Domain
+			return user.Token, newSiteToken, site.Domain
 		}
 	}
-	return "", ""
+	return "", "", ""
 }
 
-func RegisterUserForSiteByEmail(token string, email string, password string, ip string) (string, string) {
+func RegisterUserForSiteByEmail(token string, email string,
+	password string, ip string) (string, string, string) {
 	var site *Site
 	var user *User
 	var newSiteToken string
@@ -246,10 +248,10 @@ func RegisterUserForSiteByEmail(token string, email string, password string, ip 
 		if "" != user.Token {
 			newSiteToken = encryptString(user.Token + site.SitePrivateToken)
 			user.UserAddSiteToken(newSiteToken)
-			return newSiteToken, site.Domain
+			return user.Token, newSiteToken, site.Domain
 		}
 	}
-	return "", ""
+	return "", "", ""
 }
 
 func getUserFromSiteToken(sitePrivateToken string, userSiteToken string) *User {

@@ -13,14 +13,75 @@
             <div class="form-group">
                 <label id="emailLabel"></label>
                 <input type="email" class="form-control" id="userLoginEmail" placeholder="tom@hanks.com">
-                <small class="form-text text-muted" id="noSharingLabel"></small>
+                <small class="form-text" id="notRegisterLabel"></small>
             </div>
             <div class="form-group">
                 <label id="passwordLabel"></label>
                 <input type="password" class="form-control" id="userLoginPassword" placeholder="******">
+                <small class="form-text" id="passwordNotice"></small>
             </div>
             <button type="submit" class="btn btn-primary" id="submitButton"></button>
+            <button type="submit" class="btn btn-secondary" id="registerButton"></button>
         </div>
     </div>
 </body>
 
+<script>
+
+
+    var userLoginEmail = $("#userLoginEmail");
+    var userLoginNotice = $("#notRegisterLabel");
+    var userLoginPassword = $("#userLoginPassword");
+    userLoginEmail.on('input', function () {
+        if (checkEmail(userLoginEmail.val())){
+            userLoginNotice.html($.i18n.prop("EmailHasNoProblem"));
+            userLoginNotice.css("color", "#20bf6b")
+        } else {
+            userLoginNotice.html($.i18n.prop("EmailHasProblem"));
+            userLoginNotice.css("color", "#ff4d4d")
+        }
+    });
+
+    $("#registerButton").click(function() {
+        window.location.href = "/register";
+    });
+
+    $("#submitButton").click(function() {
+        if (!checkEmail(userLoginEmail.val())){
+            swal("Oops", $.i18n.prop("EmailHasProblem"), "error");
+            return
+        }
+        var url = "/api/userLoginByEmail";
+        if(!$_GET['publicToken']){
+            loginAdmin();
+            return
+        }
+        $.post(url, {
+            publicToken: $_GET['publicToken'],
+            email: userLoginEmail.val(),
+            passsword: userLoginPassword.val(),
+        }).then(function (result) {
+            if (!result["success"]){
+                swal("Oops", result["info"], "warning");
+            } else {
+                localStorage.setItem("token", result['token']);
+                window.location.href = result['domain'] + `/callback?token=${result['siteToken']}`
+            }
+        })
+    });
+
+    function loginAdmin() {
+        url = "/api/loginAdmin";
+        $.post(url, {
+            email: userLoginEmail.val(),
+            passsword: userLoginPassword.val(),
+        }).then(function (result) {
+            if (!result["success"]){
+                swal("Oops", result["info"], "warning");
+            } else {
+                localStorage.setItem("token", result['token']);
+                window.location.href = '/admin'
+            }
+        })
+    }
+</script>

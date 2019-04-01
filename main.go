@@ -25,12 +25,12 @@ func startServer() {
 	router.LoadHTMLGlob("templates/*")
 
 	//api
-	router.GET("/api/addSite", addSiteAPI)
-	router.GET("/api/loginAdmin", loginAdminAPI)
-	router.GET("/api/regenerateSiteToken", regenerateSiteTokenAPI)
+	router.POST("/api/addSite", addSiteAPI)
+	router.POST("/api/loginAdmin", loginAdminAPI)
+	router.POST("/api/regenerateSiteToken", regenerateSiteTokenAPI)
 	router.GET("/api/getAllSites", getAllSitesAPI)
-	router.GET("/api/userLoginByEmail", userLoginByEmailAPI)
-	router.GET("/api/userRegisterByEmail", userRegisterByEmailAPI)
+	router.POST("/api/userLoginByEmail", userLoginByEmailAPI)
+	router.POST("/api/userRegisterByEmail", userRegisterByEmailAPI)
 
 	//web pages
 	router.GET("/", login)

@@ -16,6 +16,8 @@
 
     <script src="https://cdn-bucket.ibkiller.com/js/jquery.min.js"></script>
     <script type="text/javascript" src="assets/i18n.js"></script>
+    <script src="https://cdn-bucket.ibkiller.com/js/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn-bucket.ibkiller.com/css/sweetalert2.min.css">
 
     <script>
         var BASE64 = {
@@ -175,6 +177,33 @@
                 }
             }
         }
+        function checkEmail(email) {
+            var emailReg = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+            if(email.value === ""){
+                return false;
+            }else return emailReg.test(email);
+        }
+        function checkPassword(password){
+            if(password.length >=6) {
+                if(/[a-zA-Z]+/.test(password) && /[0-9]+/.test(password) && /\W+\D+/.test(password)) {
+                    return true
+                }else if(/[a-zA-Z]+/.test(password) || /[0-9]+/.test(password) || /\W+\D+/.test(password)) {
+                    if(/[a-zA-Z]+/.test(password) && /[0-9]+/.test(password)) {
+                        return false
+                    }else if(/\[a-zA-Z]+/.test(password) && /\W+\D+/.test(password)) {
+                        return false
+                    }else if(/[0-9]+/.test(password) && /\W+\D+/.test(password)) {
+                        return false
+                    }else{
+                        return false
+                    }
+                }
+            }
+            return false
+        }
+        function goBack() {
+            window.history.go(-1);
+        }
         function renderTranslate(){
             jQuery.i18n.properties({
                 name : 'string',
@@ -200,8 +229,8 @@
                     $('#siteAdminLabel').html($.i18n.prop('SiteAdmin'));
                     $('#addSiteButton').html($.i18n.prop('AddSite'));
                     $('#sourceAdminLabel').html($.i18n.prop('NewSource'));
-                    $('#settingLabel').html($.i18n.prop('Setting'));
-                    $('#settingLabel').html($.i18n.prop('Setting'));
+                    $('#registerButton').html($.i18n.prop('Register'));
+                    $('#notRegisterLabel').html($.i18n.prop('NotRegister'));
                     $('#settingLabel').html($.i18n.prop('Setting'));
                     $('#settingLabel').html($.i18n.prop('Setting'));
                     $('#settingLabel').html($.i18n.prop('Setting'));

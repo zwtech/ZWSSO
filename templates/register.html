@@ -12,20 +12,93 @@
     <div class="registerInputGroup">
         <div class="form-group">
             <label id="emailLabel"></label>
-            <input type="email" class="form-control" id="userLoginEmail" placeholder="tom@hanks.com">
-            <small class="form-text text-muted" id="noSharingLabel"></small>
+            <input type="email" class="form-control" id="userRegEmail" placeholder="tom@hanks.com">
+            <small class="form-text" id="noSharingLabel"></small>
         </div>
         <div class="form-group">
             <label id="passwordLabel"></label>
-            <input type="password" class="form-control" id="userLoginPassword" placeholder="******">
+            <input type="password" class="form-control" id="userRegPassword" placeholder="******">
+            <small class="form-text" id="passwordNotice"></small>
         </div>
         <div class="form-group">
             <label id="confirmPasswordLabel"></label>
-            <input type="password" class="form-control" id="userConfirmLoginPassword" placeholder="******">
+            <input type="password" class="form-control" id="userRegConfirm" placeholder="******">
+            <small class="form-text" id="confirmNotice"></small>
         </div>
-        <button type="submit" class="btn btn-secondary" id="backToLoginButton"></button>
+        <button type="submit" class="btn btn-secondary" id="backToLoginButton" onclick="goBack()">
+        </button>
         <button type="submit" class="btn btn-primary" id="submitButton"></button>
     </div>
 </div>
 </body>
+
+<script>
+    var userRegEmail = $("#userRegEmail");
+    var userRegNotice = $("#noSharingLabel");
+
+    userRegEmail.on('input', function () {
+        if (checkEmail(userRegEmail.val())){
+            userRegNotice.html($.i18n.prop("EmailHasNoProblem"));
+            userRegNotice.css("color", "#20bf6b")
+        } else {
+            userRegNotice.html($.i18n.prop("EmailHasProblem"));
+            userRegNotice.css("color", "#ff4d4d")
+        }
+    });
+
+    var userRegPassword = $("#userRegPassword");
+    var passwordNotice = $("#passwordNotice");
+
+    userRegPassword.on('input', function () {
+        if (checkPassword(userRegPassword.val())){
+            passwordNotice.html($.i18n.prop("PasswordHasNoProblem"));
+            passwordNotice.css("color", "#20bf6b")
+        } else {
+            passwordNotice.html($.i18n.prop("PasswordHasProblem"));
+            passwordNotice.css("color", "#ff4d4d")
+        }
+    });
+
+    var userRegConfirm = $("#userRegConfirm");
+    var confirmNotice = $("#confirmNotice");
+
+    userRegConfirm.on('input', function () {
+        if (userRegConfirm.val() === userRegPassword.val()){
+            confirmNotice.html($.i18n.prop("ConfirmHasNoProblem"));
+            confirmNotice.css("color", "#20bf6b")
+        } else {
+            confirmNotice.html($.i18n.prop("ConfirmHasProblem"));
+            confirmNotice.css("color", "#ff4d4d")
+        }
+    });
+
+    $("#submitButton").click(function() {
+        if (!checkEmail(userRegEmail.val())){
+            swal("Oops", $.i18n.prop("EmailHasProblem"), "error");
+            return
+        }
+        if (!checkPassword(userRegPassword.val())){
+            swal("Oops", $.i18n.prop("PasswordHasProblem"), "error");
+            return
+        }
+        if (userRegConfirm.val() !== userRegPassword.val()){
+            swal("Oops", $.i18n.prop("ConfirmHasProblem"), "error");
+            return
+        }
+        var url = "/api/userRegisterByEmail";
+        $.post(url, {
+            publicToken: $_GET['publicToken'],
+            email: userRegEmail.val(),
+            passsword: userRegPassword.val(),
+        }).then(function (result) {
+            if (!result["success"]){
+                swal("Oops", result["info"], "warning");
+            } else {
+                localStorage.setItem("token", result['token']);
+                window.location.href = result['domain'] + `/callback?token=${result['siteToken']}`
+            }
+        })
+    });
+
+</script>
 
